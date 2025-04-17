@@ -1,37 +1,40 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>계산기</title>
 </head>
 <body>
 <form method="post">
     <label>
-        <input autofocus name="a" type="number">
+        <input autofocus name="a" type="number" th:value="${a == null ? 0 : a}">
     </label>
     <label>
         <select name="op">
-            <option selected value="plus">+</option>
-            <option value="minus">-</option>
-            <option value="multiply">*</option>
-            <option value="divide">/</option>
-            <option value="modulo">%</option>
-            <option value="power">**</option>
+            <option value="plus" th:selected="${opSc == null || opSc.equals('plus')}">+</option>
+            <option value="minus" th:selected="${opSc != null && opSc.equals('minus')}">-</option>
+            <option value="multiply" th:selected="${opSc != null && opSc.equals('multiply')}">*</option>
+            <option value="divide" th:selected="${opSc != null && opSc.equals('divide')}">/</option>
+            <option value="modulo" th:selected="${opSc != null && opSc.equals('modulo')}">%</option>
+            <option value="power" th:selected="${opSc != null && op.equals('power')}">**</option>
         </select>
     </label>
     <label>
-        <input autofocus name="b" type="number">
+        <input autofocus name="b" type="number" th:value="${b == null ? 0 : b}">
     </label>
     <button type="submit">계산하기</button>
 </form>
 <div th:if="${result == null}"><b>계산하기</b> 버튼을 클릭해 주세요.</div>
-<div th:if="${result != null}" th:text="${'a' + '+' + 'b' + '=' + result}"></div>
+<div th:if="${error == null && result != null}">
+    <span th:text="${a}"></span>
+    <span th:text="${opSc}"></span>
+    <span th:text="${b}"></span>
+    =
+    <b th:text="${result}"></b>
+</div>
+<div th:if="${error != null}" th:text="${error}"></div>
 </body>
 </html>
-<!--POST 에서 표시되는 뷰에서 각 input 태그와 select 태그가 기존에 전달한 값을 유지하도록 th:value th:selected
-연산 결과 표시 (3 + 3 = 6) 연산이 나누기 혹은 나머지 일 때 후행하는 피연산자가 0일 경우 0으로 나눌 수 없습니다 메세지 출력
-개발자 도구로 input의 type을 강제로 수정하고 올바르지 않은 숫자를 요청했을 때 터지는게 아니라 '올바른 메세지가 아닙니다'라는 메세지 출력하기
-문자열 집어넣으면 올바른 숫자를 입력하세요-->

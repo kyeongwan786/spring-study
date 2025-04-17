@@ -27,31 +27,72 @@ public class StudyController {
     }
 
     @RequestMapping(value = "/calc", method = RequestMethod.POST, produces = MediaType.TEXT_HTML_VALUE)
-    public String postCalc(@RequestParam(value = "a") double a,
-                           @RequestParam(value = "b") double b,
+    public String postCalc(@RequestParam(value = "a") String astr,
+                           @RequestParam(value = "b") String bstr,
                            @RequestParam(value = "op") String op,
                            Model model) {
         System.out.println("post");
-        Double result = null;
-        if( op.equals("plus")) {
-            result = a + b;
+        Double a = null;
+        Double b = null;
+        String error = null;
+
+        try {
+            a = Double.parseDouble(astr);
+            b = Double.parseDouble(bstr);
+        } catch (NumberFormatException ignored) {
+            error = "올바른 숫자가 아닙니다.";
         }
-        if( op.equals("minus")) {
-            result = a - b;
+        if (error == null) {
+            if ((op.equals("divide") || op.equals("modulo")) && b == 0D) {
+                error = "0으로 나눌 수 없습니다.";
+            } else {
+                Double result = null;
+                String opSc = null;
+                switch (op) {
+                    case "plus":
+                        result = a + b;
+                        opSc = "+";
+                        break;
+                    case "minus":
+                        result = a - b;
+                        opSc = "-";
+                        break;
+                    case "divide":
+                        result = a / b;
+                        opSc = "/";
+                        break;
+                    case "modulo":
+                        result = a % b;
+                        opSc = "%";
+                        break;
+                    case "multiply":
+                        result = a * b;
+                        opSc = "*";
+                        break;
+                    case "pow":
+                        result = Math.pow(a, b);
+                        opSc = "**";
+                        break;
+                }
+                model.addAttribute("a", a); // 연산식을 표현하기 위해 필요
+                model.addAttribute("b", b); // 연산식을 표현하기 위해 필요
+                model.addAttribute("opSc", opSc); // 연산식을 표현하기 위해 필요
+                model.addAttribute("op", op); // select 태그의 초기 선택될 option 태그에 selected 속성을 부여하기 위해 필요
+                model.addAttribute("result", result); // 결과값 전달
+            }
+
         }
-        if( op.equals("multiply")) {
-            result = a * b;
-        }
-        if( op.equals("divide")) {
-            result = a / b;
-        }
-        if( op.equals("modulo")) {
-            result = a % b;
-        }
-        if( op.equals("power")) {
-            result = Math.pow(a, b);
-        }
-        model.addAttribute("result", result);
+
+        model.addAttribute("error", error);
         return "study/calc";
     }
 }
+
+//Double result = switch (op) {
+//    case "plus" -> a + b;
+//    case "minus" -> a - b;
+//    case "multiply" -> a + b;
+//    case "plus" -> a + b;
+//    case "plus" -> a + b;
+//    default -> null;
+//} switch 표현식
